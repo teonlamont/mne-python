@@ -2121,7 +2121,8 @@ def _read_one_epoch_file(f, tree, fname, proj, add_eeg_ref, verbose):
 
 
 @verbose
-def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None):
+def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
+                baseline=None):
     """Read epochs from a fif file
 
     Parameters
@@ -2162,6 +2163,12 @@ def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None):
         epoch = _read_one_epoch_file(fid, tree, fname, proj, add_eeg_ref,
                                      verbose)
         epochs.append(epoch)
+        # baseline correct
+        if baseline is not None and epochs.baseline != (None, None):
+            rescale(epochs, epochs._raw_times, baseline, 'mean', copy=False,
+                    verbose=verbose)
+        else:
+            raise ValueError('Fill in.')
 
         if next_fname is not None:
             fnames.append(next_fname)
