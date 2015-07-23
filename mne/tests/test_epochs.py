@@ -391,6 +391,7 @@ def test_read_write_epochs():
                            eog=True, exclude='bads')
     eog_ch_names = [raw.ch_names[k] for k in eog_picks]
     epochs.drop_channels(eog_ch_names)
+    epochs_no_bl.drop_channels(eog_ch_names)
     assert_true(len(epochs.info['chs']) == len(epochs.ch_names) ==
                 epochs.get_data().shape[1])
     data_no_eog = epochs.get_data()
@@ -433,8 +434,7 @@ def test_read_write_epochs():
     assert_true(str(epochs_read).startswith('<Epochs'))
 
     assert_array_almost_equal(epochs_read.get_data(), epochs.get_data())
-    assert_array_almost_equal(epochs_read.get_data(),
-                              epochs_no_bl_read.get_data())
+    assert_array_almost_equal(epochs.get_data(), epochs_no_bl_read.get_data())
     assert_array_equal(epochs_read.times, epochs.times)
     assert_array_almost_equal(epochs_read.average().data, evoked.data)
     assert_equal(epochs_read.proj, epochs.proj)

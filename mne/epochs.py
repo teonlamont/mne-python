@@ -2179,7 +2179,7 @@ def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
     epochs._bad_dropped = True
     # baseline correct
     if baseline is not None:
-        rescale(epochs, epochs._raw_times, baseline, 'mean', copy=False,
+        rescale(epochs._data, epochs.times, baseline, 'mean', copy=False,
                 verbose=verbose)
     return epochs
 
