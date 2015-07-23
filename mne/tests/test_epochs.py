@@ -369,8 +369,12 @@ def test_read_write_epochs():
     raw, events, picks = _get_data()
     tempdir = _TempDir()
     temp_fname = op.join(tempdir, 'test-epo.fif')
+    temp_fname_no_bl = op.join(tempdir, 'test_no_bl-epo.fif')
+    baseline = (None, 0)
     epochs = Epochs(raw, events, event_id, tmin, tmax, picks=picks,
-                    baseline=(None, 0), preload=True)
+                    baseline=baseline, preload=True)
+    epochs_no_bl = Epochs(raw, events, event_id, tmin, tmax, picks=picks,
+                          baseline=None, preload=True)
     evoked = epochs.average()
     data = epochs.get_data()
 
@@ -423,10 +427,14 @@ def test_read_write_epochs():
 
     # test IO
     epochs.save(temp_fname)
+    epochs_no_bl.save(temp_fname_no_bl)
     epochs_read = read_epochs(temp_fname)
+    epochs_no_bl_read = read_epochs(temp_fname_no_bl, baseline=baseline)
     assert_true(str(epochs_read).startswith('<Epochs'))
 
     assert_array_almost_equal(epochs_read.get_data(), epochs.get_data())
+    assert_array_almost_equal(epochs_read.get_data(),
+                              epochs_no_bl_read.get_data())
     assert_array_equal(epochs_read.times, epochs.times)
     assert_array_almost_equal(epochs_read.average().data, evoked.data)
     assert_equal(epochs_read.proj, epochs.proj)
