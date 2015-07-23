@@ -2146,6 +2146,14 @@ def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
     verbose : bool, str, int, or None
         If not None, override default verbose level (see mne.verbose).
         Defaults to raw.verbose.
+    baseline : None or tuple of length 2 (default (None, 0))
+        The time interval to apply baseline correction.
+        If None do not apply it. If baseline is (a, b)
+        the interval is between "a (s)" and "b (s)".
+        If a is None the beginning of the data is used
+        and if b is None then b is set to the end of the interval.
+        If baseline is equal to (None, None) all the time
+        interval is used.
 
     Returns
     -------
@@ -2163,18 +2171,16 @@ def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
         epoch = _read_one_epoch_file(fid, tree, fname, proj, add_eeg_ref,
                                      verbose)
         epochs.append(epoch)
-        # baseline correct
-        if baseline is not None and epochs.baseline != (None, None):
-            rescale(epochs, epochs._raw_times, baseline, 'mean', copy=False,
-                    verbose=verbose)
-        else:
-            raise ValueError('Fill in.')
 
         if next_fname is not None:
             fnames.append(next_fname)
 
     epochs = _concatenate_epochs(epochs, read_file=True)
     epochs._bad_dropped = True
+    # baseline correct
+    if baseline is not None:
+        rescale(epochs, epochs._raw_times, baseline, 'mean', copy=False,
+                verbose=verbose)
     return epochs
 
 
