@@ -2122,7 +2122,7 @@ def _read_one_epoch_file(f, tree, fname, proj, add_eeg_ref, verbose):
 
 @verbose
 def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
-                baseline=None):
+                baseline='original'):
     """Read epochs from a fif file
 
     Parameters
@@ -2146,10 +2146,12 @@ def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
     verbose : bool, str, int, or None
         If not None, override default verbose level (see mne.verbose).
         Defaults to raw.verbose.
-    baseline : None or tuple of length 2 (default (None, 0))
-        The time interval to apply baseline correction.
-        If None do not apply it. If baseline is (a, b)
-        the interval is between "a (s)" and "b (s)".
+    baseline : 'original' | None | tuple of length 2
+        The time interval to apply baseline correction. If 'original', it loads
+        the epochs file as it was saved; no additional baseline correction will
+        be applied. If None, no baseline will be applied to the epochs; this is
+        only applicable if saved epochs were not baseline corrected. If baseline
+        is (a, b) the interval is between "a (s)" and "b (s)".
         If a is None the beginning of the data is used
         and if b is None then b is set to the end of the interval.
         If baseline is equal to (None, None) all the time
@@ -2178,9 +2180,16 @@ def read_epochs(fname, proj=True, add_eeg_ref=True, verbose=None,
     epochs = _concatenate_epochs(epochs, read_file=True)
     epochs._bad_dropped = True
     # baseline correct
-    if baseline is not None:
+    if baseline is None and epochs.baseline is not None:
+        raise ValueError('A baseline correction was already applied to the '
+                         'epochs, `baseline=None` is invalid.')
+    elif isinstance(baseline, tuple):
         rescale(epochs._data, epochs.times, baseline, 'mean', copy=False,
                 verbose=verbose)
+        epochs.baseline = baseline
+    elif isinstance(baseline, str) and baseline != 'original':
+        raise ValueError('`baseline=%s` is an invalid argument.' % baseline)
+
     return epochs
 
 

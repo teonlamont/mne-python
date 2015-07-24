@@ -375,6 +375,7 @@ def test_read_write_epochs():
                     baseline=baseline, preload=True)
     epochs_no_bl = Epochs(raw, events, event_id, tmin, tmax, picks=picks,
                           baseline=None, preload=True)
+    assert_true(epochs_no_bl.baseline == None) 
     evoked = epochs.average()
     data = epochs.get_data()
 
@@ -431,8 +432,10 @@ def test_read_write_epochs():
     epochs_no_bl.save(temp_fname_no_bl)
     epochs_read = read_epochs(temp_fname)
     epochs_no_bl_read = read_epochs(temp_fname_no_bl, baseline=baseline)
+    assert_true(epochs_no_bl_read.baseline == baseline)
     assert_true(str(epochs_read).startswith('<Epochs'))
 
+    assert_array_equal(epochs_no_bl_read.times, epochs.times)
     assert_array_almost_equal(epochs_read.get_data(), epochs.get_data())
     assert_array_almost_equal(epochs.get_data(), epochs_no_bl_read.get_data())
     assert_array_equal(epochs_read.times, epochs.times)
