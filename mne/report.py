@@ -1052,8 +1052,6 @@ class Report(object):
         html.append(u'<div class="thumbnail">')
         html.append(u'<li class="slider" id="%d">\n' % global_id)
         html.append(u'<div class="row">')
-
-        html.append(u'<div class="col-xs-6 col-md-4">')
         html.append(u'<div style="text-align:center;">')
         slides_klass = '%s-%s' % (name, global_id)
 
@@ -1101,7 +1099,6 @@ class Report(object):
         html.append(_build_html_slider(sl, slides_klass, slider_id,
                                        start_value=0))
         html.append(u'</div>')   # div for center
-        html.append(u'</div>')  # div for grid
         html.append(u'</div>')  # div for row
         html.append(u'</div>')  # div for the thumbnail window
         html.append(u'</li>\n')
