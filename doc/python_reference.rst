@@ -950,6 +950,7 @@ Realtime
 
    FieldTripClient
    LSLClient
+   MockLSLStream
    MockRtClient
    RtEpochs
    RtClient
